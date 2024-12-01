@@ -15,10 +15,8 @@
     "format": "prettier --write \"./{src,tests}/**/*.{ts,tsx,js,jsx,json}\"",
     "update-universal-dependencies": "umaintenance update-universal-dependencies"
   },
-  "dependencies": {
-    "@trpc/server": "^11.0.0-rc.648"
-  },
   "peerDependencies": {
+    "@trpc/server": "^11.0.0-rc.648",
     "@universal-packages/express-controllers": "^1.14.3"
   },
   "devDependencies": {
