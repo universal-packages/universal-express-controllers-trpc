@@ -3,10 +3,10 @@ import * as trpcExpress from '@trpc/server/adapters/express'
 
 export const createContext = ({ req, res }: trpcExpress.CreateExpressContextOptions) => ({}) // no context
 type Context = Awaited<ReturnType<typeof createContext>>
-const t = initTRPC.context<Context>().create()
+export const trpc = initTRPC.context<Context>().create()
 
-const router = t.router
-const publicProcedure = t.procedure
+const router = trpc.router
+const publicProcedure = trpc.procedure
 
 export const appRouter = router({
   userList: publicProcedure.query(async () => {

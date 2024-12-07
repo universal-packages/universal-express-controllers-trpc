@@ -1,4 +1,6 @@
-import { initialize } from '../src'
+import { Measurement } from '@universal-packages/time-measurer'
+
+import { getTrpcReference, initialize } from '../src'
 
 beforeAll(() => {
   initialize({ trpcLocation: 'tests/__fixtures__/trpc/trpc.ts' })
@@ -7,6 +9,12 @@ beforeAll(() => {
 describe('TRPC', (): void => {
   describe('making a trpc request', (): void => {
     it('returns ok and renders the user', async (): Promise<void> => {
+      const listener = jest.fn()
+
+      getTrpcReference().emitter.on('error', listener)
+      getTrpcReference().emitter.on('start', listener)
+      getTrpcReference().emitter.on('end', listener)
+
       await runExpressControllers()
 
       await fGet('/trpc/userList\?batch\=1\&input\=%7B%7D')
@@ -21,6 +29,15 @@ describe('TRPC', (): void => {
             ]
           }
         }
+      ])
+      expect(listener.mock.calls).toEqual([
+        [
+          {
+            endpoints: ['userList'],
+            params: { batch: '1', input: '{}' }
+          }
+        ],
+        [{ endpoints: ['userList'], params: { batch: '1', input: '{}' }, measure: expect.any(Measurement) }]
       ])
     })
   })

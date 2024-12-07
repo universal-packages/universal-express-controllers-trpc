@@ -1,2 +1,2 @@
-export { initialize, getTRPC } from './initialize'
+export { initialize, getTrpcReference } from './initialize'
 export * from './types'

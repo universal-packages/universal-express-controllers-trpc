@@ -1,4 +1,4 @@
-import { getTRPC, initialize } from '../src'
+import { getTrpcReference, initialize } from '../src'
 
 describe(initialize, (): void => {
   it('loads trpc references', async (): Promise<void> => {
@@ -7,7 +7,7 @@ describe(initialize, (): void => {
 
     initialize({ trpcLocation: 'tests/__fixtures__/trpc/trpc.ts' })
 
-    const trpc = getTRPC()
+    const trpc = getTrpcReference()
 
     expect(trpc).toBeDefined()
 
