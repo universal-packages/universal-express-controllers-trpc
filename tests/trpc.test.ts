@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server'
 import { Measurement } from '@universal-packages/time-measurer'
 
 import { getTrpcReference, initialize } from '../src'
@@ -31,13 +32,33 @@ describe('TRPC', (): void => {
         }
       ])
       expect(listener.mock.calls).toEqual([
-        [
-          {
-            endpoints: ['userList'],
-            params: { batch: '1', input: '{}' }
+        [{ event: 'start', payload: { endpoints: ['userList'], params: { batch: '1', input: '{}' } } }],
+        [{ event: 'end', payload: { endpoints: ['userList'], params: { batch: '1', input: '{}' } }, measurement: expect.any(Measurement) }]
+      ])
+
+      listener.mockClear()
+
+      await fGet('/trpc/errored\?batch\=1\&input\=%7B%7D')
+
+      expect(fResponse).toHaveReturnedWithStatus('INTERNAL_SERVER_ERROR')
+      expect(fResponseBody).toMatchObject([
+        {
+          error: {
+            message: 'This is an error',
+            code: -32603,
+            data: {
+              code: 'INTERNAL_SERVER_ERROR',
+              httpStatus: 500,
+              stack: expect.any(String),
+              path: 'errored'
+            }
           }
-        ],
-        [{ endpoints: ['userList'], params: { batch: '1', input: '{}' }, measure: expect.any(Measurement) }]
+        }
+      ])
+      expect(listener.mock.calls).toEqual([
+        [{ event: 'start', payload: { endpoints: ['errored'], params: { batch: '1', input: '{}' } } }],
+        [{ event: 'error', error: new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'This is an error' }), payload: { endpoints: ['errored'] } }],
+        [{ event: 'end', payload: { endpoints: ['errored'], params: { batch: '1', input: '{}' } }, measurement: expect.any(Measurement) }]
       ])
     })
   })

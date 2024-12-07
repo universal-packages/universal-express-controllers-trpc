@@ -14,6 +14,9 @@ export const appRouter = router({
       { id: 1, name: 'John Doe' },
       { id: 2, name: 'Jane Doe' }
     ]
+  }),
+  errored: publicProcedure.query(async () => {
+    throw new Error('This is an error')
   })
 })
 

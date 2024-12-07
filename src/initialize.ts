@@ -1,6 +1,6 @@
 import * as trpcExpress from '@trpc/server/adapters/express'
+import { EventEmitter } from '@universal-packages/event-emitter'
 import { checkFile } from '@universal-packages/fs-utils'
-import EventEmitter from 'events'
 import { Handler } from 'express'
 
 import { ExpressControllersTRPCOptions } from './types'
@@ -19,8 +19,10 @@ export function initialize(options?: ExpressControllersTRPCOptions): void {
     const trpcMiddleware = trpcExpress.createExpressMiddleware({
       router,
       createContext,
-      onError: (error) => {
-        emitter.emit('error', error)
+      onError: (event) => {
+        const endpoints = event.path.split('/').slice(-1)[0].split(',')
+
+        emitter.emit('error', { error: event.error, payload: { endpoints } })
       }
     })
 
